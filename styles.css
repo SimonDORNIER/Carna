@@ -1,0 +1,39 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.circuit {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    border: 5px solid #333;
+    background-color: #ccc;
+}
+
+.car {
+    position: absolute;
+    width: 50px;
+    height: 30px;
+    background-color: red;
+    top: 20px;
+}
+
+#car2 {
+    top: 70px;
+    background-color: blue;
+}
+
+#car3 {
+    top: 120px;
+    background-color: green;
+}
+
+#car4 {
+    top: 170px;
+    background-color: yellow;
+}

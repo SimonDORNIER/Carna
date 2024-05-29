@@ -8,25 +8,11 @@ body {
     background-color: #f0f0f0;
 }
 
-#game-container {
+.game-container {
     text-align: center;
 }
 
-#track {
+canvas {
     border: 2px solid #000;
     background-color: #fff;
-}
-
-#controls {
-    margin: 20px;
-}
-
-#controls button {
-    margin: 5px;
-    padding: 10px;
-    font-size: 16px;
-}
-
-#status {
-    margin-top: 20px;
 }

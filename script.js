@@ -13,12 +13,31 @@ class Car {
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(this.angle);
+        
+        // Draw the car body
         ctx.fillStyle = this.color;
         ctx.fillRect(-10, -5, 20, 10); // Car body
         ctx.beginPath();
         ctx.arc(10, 0, 5, 5, Math.PI, false); // Car nose
         ctx.fill();
+        
+        // Draw the cone
+        this.drawCone(ctx);
+
         ctx.restore();
+    }
+
+    drawCone(ctx) {
+        const coneRadius = 50; // Radius of the cone
+        const coneAngle = Math.PI / 1; // 90° cone
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0); // Starting from the nose of the car
+        ctx.arc(0, 0, coneRadius, -coneAngle / 2, coneAngle / 2);
+        ctx.closePath();
+        
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)'; // Semi-transparent white
+        ctx.fill();
     }
 
     moveTo(x, y) {
@@ -40,11 +59,12 @@ class Game {
         this.canvas = document.getElementById('raceTrack');
         this.ctx = this.canvas.getContext('2d');
         this.cars = [
-            new Car(380, 115, Math.PI*2, 'red'), // Starting on the start line
-            new Car(380, 135, Math.PI*2, 'blue') // Starting on the start line
+            new Car(380, 115, Math.PI * 2, 'red'), // Starting on the start line
+            new Car(380, 135, Math.PI * 2, 'blue') // Starting on the start line
         ];
         this.currentPlayer = 0;
         this.currentGabarit = 20;
+        this.players = []; // Array to store players and their scores
         this.bindEvents();
         this.render();
     }
@@ -56,13 +76,13 @@ class Game {
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 5;
         ctx.stroke();
-        
+
         ctx.beginPath();
         ctx.ellipse(400, 300, 300, 150, 0, 0, 2 * Math.PI); // Inner oval
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 5;
         ctx.stroke();
-        
+
         // Draw start line
         ctx.beginPath();
         ctx.moveTo(400, 100);
@@ -81,6 +101,37 @@ class Game {
         document.querySelectorAll('.controls button').forEach(button => {
             button.addEventListener('click', (e) => this.setGabarit(e));
         });
+        document.getElementById('add-player').addEventListener('click', () => this.addPlayer());
+    }
+
+    addPlayer() {
+        const playerNameInput = document.getElementById('player-name');
+        const playerName = playerNameInput.value.trim();
+        if (playerName) {
+            const player = { name: playerName, score: 0 };
+            this.players.push(player);
+            playerNameInput.value = '';
+            this.updatePlayerList();
+        }
+    }
+
+    updatePlayerList() {
+        const playerList = document.getElementById('player-list');
+        playerList.innerHTML = '';
+        this.players.forEach((player, index) => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                ${player.name}: ${player.score} 
+                <button onclick="game.updateScore(${index}, 1)">+1</button>
+                <button onclick="game.updateScore(${index}, -1)">-1</button>
+            `;
+            playerList.appendChild(listItem);
+        });
+    }
+
+    updateScore(index, change) {
+        this.players[index].score += change;
+        this.updatePlayerList();
     }
 
     setGabarit(event) {
@@ -139,7 +190,7 @@ class Game {
             car.laps += 1;
             document.getElementById(`${car.color}-car-laps`).innerText = `Tours de la voiture ${car.color}: ${car.laps}`;
             if (car.laps === 10) {
-                //this.flashScreen();
+                this.flashScreen();
             }
         }
     }
@@ -166,7 +217,7 @@ class Game {
         const body = document.body;
         let flashCount = 0;
         const colors = ['red', 'green', 'blue', 'orange', 'purple', 'pink', 'cyan', 'magenta', 'lime', 'yellow'];
-        
+
         const interval = setInterval(() => {
             if (flashCount < 20) { // Flash 10 times
                 body.style.backgroundColor = (flashCount % 2 === 0) ? colors[Math.floor(Math.random() * colors.length)] : '#f0f0f0';
@@ -177,9 +228,7 @@ class Game {
             }
         }, 200);
     }
-    
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
     const game = new Game();

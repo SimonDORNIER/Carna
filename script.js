@@ -5,6 +5,8 @@ class Car {
         this.angle = angle;
         this.color = color;
         this.moveDistance = 20;
+        this.laps = 0;
+        this.hasCrossedStart = false; // Used to track if the car has crossed the start line
     }
 
     draw(ctx) {
@@ -14,7 +16,7 @@ class Car {
         ctx.fillStyle = this.color;
         ctx.fillRect(-10, -5, 20, 10); // Car body
         ctx.beginPath();
-        ctx.arc(10, 0, 5, 0, Math.PI, false); // Car nose
+        ctx.arc(10, 0, 5, 5, Math.PI, false); // Car nose
         ctx.fill();
         ctx.restore();
     }
@@ -38,33 +40,43 @@ class Game {
         this.canvas = document.getElementById('raceTrack');
         this.ctx = this.canvas.getContext('2d');
         this.cars = [
-            new Car(400, 300, 0, 'red'),
-            new Car(400, 320, 0, 'blue')
+            new Car(380, 115, Math.PI*2, 'red'), // Starting on the start line
+            new Car(380, 135, Math.PI*2, 'blue') // Starting on the start line
         ];
         this.currentPlayer = 0;
         this.currentGabarit = 20;
-        this.track = this.generateTrack();
         this.bindEvents();
         this.render();
     }
 
-    generateTrack() {
-        // Track generation logic
-        return [
-            { x: 100, y: 100, radius: 200 }
-        ];
-    }
-
     drawTrack() {
-        this.track.forEach((circle) => {
-            this.ctx.beginPath();
-            this.ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
-            this.ctx.stroke();
-        });
+        const ctx = this.ctx;
+        ctx.beginPath();
+        ctx.ellipse(400, 300, 350, 200, 0, 0, 2 * Math.PI); // Outer oval
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 5;
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.ellipse(400, 300, 300, 150, 0, 0, 2 * Math.PI); // Inner oval
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 5;
+        ctx.stroke();
+        
+        // Draw start line
+        ctx.beginPath();
+        ctx.moveTo(400, 100);
+        ctx.lineTo(400, 150);
+        ctx.strokeStyle = 'green';
+        ctx.lineWidth = 2;
+        ctx.stroke();
     }
 
     bindEvents() {
-        this.canvas.addEventListener('mousemove', (e) => this.showArrow(e));
+        this.canvas.addEventListener('mousemove', (e) => {
+            this.showArrow(e);
+            this.updateCursorPosition(e);
+        });
         this.canvas.addEventListener('click', (e) => this.moveCar(e));
         document.querySelectorAll('.controls button').forEach(button => {
             button.addEventListener('click', (e) => this.setGabarit(e));
@@ -113,12 +125,35 @@ class Game {
         car.moveTo(newX, newY);
         car.rotateTo(angle);
 
+        this.checkLap(car);
         this.nextPlayer();
         this.render();
     }
 
+    checkLap(car) {
+        // Check if the car crosses the start line
+        if (car.x > 400 && car.y >= 100 && car.y <= 150 && !car.hasCrossedStart) {
+            car.hasCrossedStart = true;
+        } else if (car.x < 400 && car.y >= 100 && car.y <= 150 && car.hasCrossedStart) {
+            car.hasCrossedStart = false;
+            car.laps += 1;
+            document.getElementById(`${car.color}-car-laps`).innerText = `Tours de la voiture ${car.color}: ${car.laps}`;
+            if (car.laps === 10) {
+                //this.flashScreen();
+            }
+        }
+    }
+
     nextPlayer() {
         this.currentPlayer = (this.currentPlayer + 1) % this.cars.length;
+    }
+
+    updateCursorPosition(event) {
+        const rect = this.canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const cursorPosition = document.getElementById('cursor-position');
+        cursorPosition.textContent = `Position du curseur (x, y) : (${x.toFixed(0)}, ${y.toFixed(0)})`;
     }
 
     render() {
@@ -126,7 +161,25 @@ class Game {
         this.drawTrack();
         this.cars.forEach(car => car.draw(this.ctx));
     }
+
+    flashScreen() {
+        const body = document.body;
+        let flashCount = 0;
+        const colors = ['red', 'green', 'blue', 'orange', 'purple', 'pink', 'cyan', 'magenta', 'lime', 'yellow'];
+        
+        const interval = setInterval(() => {
+            if (flashCount < 20) { // Flash 10 times
+                body.style.backgroundColor = (flashCount % 2 === 0) ? colors[Math.floor(Math.random() * colors.length)] : '#f0f0f0';
+                flashCount++;
+            } else {
+                clearInterval(interval);
+                body.style.backgroundColor = '#f0f0f0'; // Ensure it returns to the original color
+            }
+        }, 200);
+    }
+    
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const game = new Game();

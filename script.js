@@ -1,45 +1,64 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const cars = [
-        { element: document.getElementById('car1'), angle: 0, speed: 1.5, direction: 1 },
-        { element: document.getElementById('car2'), angle: 90, speed: 2, direction: 1 },
-        { element: document.getElementById('car3'), angle: 180, speed: 1.7, direction: 1 },
-        { element: document.getElementById('car4'), angle: 270, speed: 1.8, direction: 1 }
-    ];
-    const circuitRadius = 225; // Radius of the outer circle
-    const innerRadius = 100; // Radius of the inner circle
-    const circuitCenter = { x: 250, y: 250 }; // Center of the circuit
-    
-    function moveCars() {
-        cars.forEach((car, index) => {
-            car.angle += car.speed * car.direction;
-            const radians = car.angle * (Math.PI / 180);
-            const carX = circuitCenter.x + circuitRadius * Math.cos(radians) - car.element.offsetWidth / 2;
-            const carY = circuitCenter.y + circuitRadius * Math.sin(radians) - car.element.offsetHeight / 2;
+// script.js
 
-            car.element.style.left = `${carX}px`;
-            car.element.style.top = `${carY}px`;
-
-            // Check for collisions with other cars
-            cars.forEach((otherCar, otherIndex) => {
-                if (index !== otherIndex) {
-                    const dx = carX - parseFloat(otherCar.element.style.left);
-                    const dy = carY - parseFloat(otherCar.element.style.top);
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < car.element.offsetWidth) {
-                        car.direction *= -1; // Reverse direction on collision
-                        otherCar.direction *= -1;
-                    }
-                }
-            });
-
-            // Check for collisions with inner circle
-            const distToCenter = Math.sqrt((carX - circuitCenter.x + car.element.offsetWidth / 2) ** 2 + (carY - circuitCenter.y + car.element.offsetHeight / 2) ** 2);
-            if (distToCenter < innerRadius + car.element.offsetWidth / 2) {
-                car.direction *= -1; // Reverse direction on collision with inner circle
-            }
-        });
-        requestAnimationFrame(moveCars);
+class Player {
+    constructor(id, color) {
+        this.id = id;
+        this.color = color;
+        this.position = { x: 100, y: 100 };
+        this.angle = 0;
     }
-    moveCars();
+
+    draw(ctx) {
+        ctx.save();
+        ctx.translate(this.position.x, this.position.y);
+        ctx.rotate(this.angle);
+        ctx.fillStyle = this.color;
+        ctx.fillRect(-10, -5, 20, 10);
+        ctx.beginPath();
+        ctx.arc(10, 0, 5, 0, Math.PI, false);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    move(distance) {
+        this.position.x += distance * Math.cos(this.angle);
+        this.position.y += distance * Math.sin(this.angle);
+    }
+}
+
+const canvas = document.getElementById('track');
+const ctx = canvas.getContext('2d');
+canvas.width = 600;
+canvas.height = 400;
+
+const players = [
+    new Player(1, 'red'),
+    new Player(2, 'blue')
+];
+let currentPlayerIndex = 0;
+let selectedGabarit = 1;
+
+document.getElementById('player-number').innerText = players[currentPlayerIndex].id;
+
+function selectGabarit(gabarit) {
+    selectedGabarit = gabarit;
+}
+
+canvas.addEventListener('click', (e) => {
+    const player = players[currentPlayerIndex];
+    player.move(selectedGabarit * 10);
+    nextTurn();
 });
+
+function nextTurn() {
+    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+    document.getElementById('player-number').innerText = players[currentPlayerIndex].id;
+    drawGame();
+}
+
+function drawGame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    players.forEach(player => player.draw(ctx));
+}
+
+drawGame();

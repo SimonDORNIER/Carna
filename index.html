@@ -3,16 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circuit de Voitures</title>
+    <title>Jeu de Course au Tour par Tour</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="circuit">
-        <div class="inner-circle"></div>
-        <div class="car" id="car1"></div>
-        <div class="car" id="car2"></div>
-        <div class="car" id="car3"></div>
-        <div class="car" id="car4"></div>
+    <div id="game-container">
+        <canvas id="track"></canvas>
+        <div id="controls">
+            <button onclick="selectGabarit(1)">Gabarit 1</button>
+            <button onclick="selectGabarit(2)">Gabarit 2</button>
+            <button onclick="selectGabarit(3)">Gabarit 3</button>
+            <button onclick="selectGabarit(4)">Gabarit 4</button>
+            <button onclick="selectGabarit(5)">Gabarit 5</button>
+        </div>
+        <div id="status">
+            <p id="current-player">Joueur actuel : <span id="player-number"></span></p>
+            <p id="winner" style="display:none;">Le gagnant est le joueur <span id="winner-number"></span>!</p>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

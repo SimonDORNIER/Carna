@@ -1,4 +1,5 @@
 body {
+    font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -7,44 +8,25 @@ body {
     background-color: #f0f0f0;
 }
 
-.circuit {
-    position: relative;
-    width: 500px;
-    height: 500px;
-    border: 5px solid #333;
-    border-radius: 50%;
-    background-color: #ccc;
-    overflow: hidden;
+#game-container {
+    text-align: center;
 }
 
-.inner-circle {
-    position: absolute;
-    width: 200px;
-    height: 200px;
+#track {
+    border: 2px solid #000;
     background-color: #fff;
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: 5px solid #333;
 }
 
-.car {
-    position: absolute;
-    width: 50px;
-    height: 30px;
-    background-color: red;
-    transition: transform 0.1s linear;
+#controls {
+    margin: 20px;
 }
 
-#car2 {
-    background-color: blue;
+#controls button {
+    margin: 5px;
+    padding: 10px;
+    font-size: 16px;
 }
 
-#car3 {
-    background-color: green;
-}
-
-#car4 {
-    background-color: yellow;
+#status {
+    margin-top: 20px;
 }
